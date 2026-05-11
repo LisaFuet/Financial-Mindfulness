@@ -1,0 +1,815 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Financial Mindfulness & Well-Being Assessment · The Wellbeing Lab</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --blue:#5AA7E0; --indigo:#5A68E0; --pink:#E05AD3; --purple:#935AE0;
+  --yellow:#E6F663; --teal:#5AE0AD; --orange:#FFB366; --coral:#FF8666;
+  --redpink:#F06077; --lavender:#E8D6FF; --lindigo:#D3D7FF; --lblue:#D1EBFF;
+  --bg:#f4f5ff;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Montserrat',sans-serif;background:var(--bg);color:#1a1a2e;min-height:100vh}
+
+/* blobs */
+#blobs{position:fixed;inset:0;pointer-events:none;z-index:0;overflow:hidden}
+.blob{position:absolute;border-radius:60% 40% 55% 45%/50% 60% 40% 55%;opacity:.11}
+.b1{width:420px;height:420px;top:-150px;left:-150px;background:#5AA7E0;animation:drift 12s ease-in-out infinite}
+.b2{width:280px;height:280px;top:18%;right:-90px;background:#E05AD3;animation:drift 9s ease-in-out infinite 3s}
+.b3{width:340px;height:340px;bottom:-110px;left:18%;background:#5AE0AD;animation:drift 11s ease-in-out infinite 1.5s}
+.b4{width:200px;height:200px;bottom:18%;right:8%;background:#935AE0;animation:drift 8s ease-in-out infinite 4s}
+@keyframes drift{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(18px,-22px) scale(1.04)}}
+
+/* screens */
+.screen{display:none;position:relative;z-index:1}
+.screen.active{display:block}
+
+/* logo */
+.logo{display:flex;align-items:center;gap:10px}
+.logo-ring{width:44px;height:44px;border-radius:50%;flex-shrink:0;position:relative;
+  background:conic-gradient(#5AA7E0 0deg,#5A68E0 51deg,#935AE0 103deg,#E05AD3 154deg,#F06077 206deg,#FF8666 257deg,#FFB366 309deg,#5AE0AD 360deg)}
+.logo-ring::after{content:'';position:absolute;inset:8px;border-radius:50%;background:var(--bg)}
+.logo-ring.sm{width:34px;height:34px}
+.logo-ring.sm::after{inset:6px}
+.logo-label{font-family:'Poppins',sans-serif;font-weight:700;font-size:15px;line-height:1.2}
+.logo-label .the{font-weight:500;font-size:10px;color:#999;letter-spacing:.5px;text-transform:uppercase}
+.logo-label.lg{font-size:22px}
+
+/* welcome */
+#screen-welcome{min-height:100vh}
+.welcome-inner{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:48px 24px}
+.welcome-inner .logo{justify-content:center;margin-bottom:44px}
+.welcome-h1{font-family:'Poppins',sans-serif;font-weight:700;font-size:clamp(26px,5vw,46px);line-height:1.15;margin-bottom:18px}
+.grad{background:linear-gradient(120deg,#5A68E0 20%,#E05AD3 80%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.welcome-sub{font-size:15px;color:#555;max-width:540px;line-height:1.8;margin-bottom:28px}
+.welcome-modules{display:grid;grid-template-columns:1fr 1fr;gap:12px;max-width:520px;width:100%;margin:0 auto 28px}
+@media(max-width:480px){.welcome-modules{grid-template-columns:1fr}}
+.w-mod{padding:16px 18px;border-radius:16px;text-align:left}
+.w-mod.fm{background:rgba(90,104,224,.07);border:1px solid rgba(90,104,224,.18)}
+.w-mod.fwb{background:rgba(90,167,224,.07);border:1px solid rgba(90,167,224,.18)}
+.w-mod-title{font-family:'Poppins',sans-serif;font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.fm .w-mod-title{color:#5A68E0}
+.fwb .w-mod-title{color:#5AA7E0}
+.w-mod ul{list-style:none;padding:0}
+.w-mod li{font-size:12px;color:#555;margin-bottom:3px;padding-left:14px;position:relative;line-height:1.5}
+.w-mod li::before{content:'·';position:absolute;left:0;color:#aaa}
+.pill-row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;margin-bottom:36px}
+.pill{padding:6px 18px;border-radius:20px;font-size:13px;font-weight:700}
+.pill-b{background:var(--lblue);color:#1a6ab0}
+.pill-p{background:var(--lavender);color:#5820b5}
+.pill-t{background:#c8f5e8;color:#0c7a52}
+
+/* buttons */
+.btn{font-family:'Poppins',sans-serif;font-weight:600;font-size:16px;padding:14px 46px;border:none;border-radius:50px;cursor:pointer;transition:transform .2s,box-shadow .2s}
+.btn-main{background:linear-gradient(135deg,#5A68E0,#935AE0);color:#fff;box-shadow:0 6px 24px rgba(90,104,224,.38)}
+.btn-main:hover{transform:translateY(-2px);box-shadow:0 10px 32px rgba(90,104,224,.5)}
+.btn-next{background:linear-gradient(135deg,#5AA7E0,#5A68E0);color:#fff;box-shadow:0 6px 24px rgba(90,167,224,.32)}
+.btn-next:hover{transform:translateY(-2px);box-shadow:0 10px 32px rgba(90,104,224,.45)}
+.btn-out{background:#fff;color:#5A68E0;border:2px solid #5A68E0}
+.btn-out:hover{background:#5A68E0;color:#fff}
+
+/* question screens */
+.q-wrap{max-width:700px;margin:0 auto;padding:36px 20px 80px}
+.q-nav{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:28px}
+.q-nav-left{min-width:0}
+.section-badge{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.5px;padding:3px 10px;border-radius:20px;margin-bottom:6px;text-transform:uppercase}
+.badge-fm{background:rgba(90,104,224,.1);color:#5A68E0}
+.badge-fwb{background:rgba(90,167,224,.1);color:#1a6ab0}
+.q-nav-title{font-family:'Poppins',sans-serif;font-weight:700;font-size:20px;margin-bottom:4px}
+.q-nav-sub{color:#666;font-size:13px;line-height:1.5;max-width:360px}
+.prog-label{font-size:12px;font-weight:700;color:#888;margin-bottom:6px;margin-top:16px}
+.prog-track{background:#e0e2f0;border-radius:99px;height:6px}
+.prog-fill{height:100%;border-radius:99px;transition:width .35s ease;width:0%}
+.pf-fm{background:linear-gradient(90deg,#5A68E0,#E05AD3)}
+.pf-fwb{background:linear-gradient(90deg,#5AA7E0,#5AE0AD)}
+.q-card{background:#fff;border-radius:20px;padding:26px 26px 22px;margin-bottom:16px;box-shadow:0 2px 12px rgba(0,0,0,.05);border-left:4px solid transparent;transition:border-color .2s,box-shadow .2s}
+.q-card:hover{box-shadow:0 4px 20px rgba(90,104,224,.08)}
+.q-card.bad{border-left-color:var(--redpink)}
+.q-num{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:9px}
+.q-num.indigo{color:#5A68E0}
+.q-num.sky{color:#5AA7E0}
+.q-text{font-size:15px;font-weight:700;line-height:1.55;margin-bottom:20px}
+.likert-ends{display:flex;justify-content:space-between;font-size:11px;color:#999;font-weight:700;margin-bottom:7px;padding:0 2px}
+.likert-opts{display:flex;gap:5px}
+.lopt{flex:1}
+.lopt input{display:none}
+.lopt label{display:flex;align-items:center;justify-content:center;height:44px;border-radius:10px;border:2px solid #e2e3f0;font-size:14px;font-weight:700;color:#bbb;cursor:pointer;transition:all .15s;user-select:none}
+.lopt label:hover{border-color:#5A68E0;color:#5A68E0;background:#eef0ff}
+.lopt input:checked + label{background:linear-gradient(135deg,#5A68E0,#935AE0);border-color:transparent;color:#fff;transform:scale(1.06);box-shadow:0 2px 8px rgba(90,104,224,.4)}
+/* FWB variant */
+.q-card.fwb .lopt label:hover{border-color:#5AA7E0;color:#5AA7E0;background:#e8f5ff}
+.q-card.fwb .lopt input:checked + label{background:linear-gradient(135deg,#5AA7E0,#5AE0AD);box-shadow:0 2px 8px rgba(90,167,224,.4)}
+.scale-inline{font-size:10px;color:#bbb;font-weight:700;text-align:center;margin-bottom:6px;letter-spacing:.3px}
+.submit-zone{text-align:center;padding-top:28px}
+.err{color:var(--redpink);font-size:14px;font-weight:700;margin-bottom:12px;display:none}
+
+/* results */
+.r-wrap{max-width:700px;margin:0 auto;padding:36px 20px 80px}
+.r-header{text-align:center;margin-bottom:32px}
+.r-header .logo{justify-content:center;margin-bottom:18px}
+.r-header h2{font-family:'Poppins',sans-serif;font-weight:700;font-size:30px;margin-bottom:8px}
+.r-header p{color:#666;font-size:14px}
+.r-section-label{font-family:'Poppins',sans-serif;font-weight:700;font-size:12px;text-transform:uppercase;letter-spacing:1px;margin-bottom:14px;display:flex;align-items:center;gap:10px}
+.r-section-label::after{content:'';flex:1;height:1px;background:#eaeaf2}
+.rsl-fm{color:#5A68E0}
+.rsl-fwb{color:#5AA7E0}
+.rsl-profile{color:#935AE0}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-bottom:20px}
+@media(max-width:540px){.two-col{grid-template-columns:1fr}}
+
+/* FM dimension cards */
+.dim-card{background:#fff;border-radius:22px;padding:26px 18px 22px;text-align:center;box-shadow:0 4px 18px rgba(0,0,0,.07)}
+.dim-card.aw{border-top:5px solid #5A68E0}
+.dim-card.ac{border-top:5px solid #5AE0AD}
+.dim-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;margin-bottom:18px}
+.aw .dim-label{color:#5A68E0}
+.ac .dim-label{color:#0c7a52}
+.circ{position:relative;width:124px;height:124px;margin:0 auto 14px}
+.circ svg{transform:rotate(-90deg)}
+.circ-bg{fill:none;stroke:#eeeef8;stroke-width:11}
+.circ-fg{fill:none;stroke-width:11;stroke-linecap:round;transition:stroke-dashoffset 1.3s cubic-bezier(.2,.8,.2,1)}
+.aw .circ-fg{stroke:#5A68E0}
+.ac .circ-fg{stroke:#5AE0AD}
+.circ-inner{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center}
+.circ-val{font-family:'Poppins',sans-serif;font-weight:700;font-size:26px;display:block}
+.circ-den{font-size:11px;color:#bbb}
+.dim-tier{font-family:'Poppins',sans-serif;font-weight:600;font-size:15px;margin-bottom:7px}
+.t-low{color:var(--redpink)}.t-mod{color:var(--orange)}.t-high{color:#0c7a52}
+.dim-desc{font-size:13px;color:#666;line-height:1.65}
+.comp-card{background:linear-gradient(130deg,#5A68E0 0%,#935AE0 55%,#E05AD3 100%);border-radius:22px;padding:28px 30px;color:#fff;margin-bottom:24px;display:flex;align-items:center;justify-content:space-between;gap:20px}
+@media(max-width:540px){.comp-card{flex-direction:column;text-align:center}}
+.comp-info h3{font-family:'Poppins',sans-serif;font-weight:700;font-size:17px;margin-bottom:7px}
+.comp-info p{font-size:13px;opacity:.85;line-height:1.65;max-width:360px}
+.comp-big{font-family:'Poppins',sans-serif;font-weight:700;font-size:56px;white-space:nowrap;line-height:1}
+.comp-big span{font-size:20px;opacity:.6;vertical-align:middle}
+
+/* FWB dimension cards */
+.fwb-card{background:#fff;border-radius:22px;padding:24px;box-shadow:0 4px 18px rgba(0,0,0,.07);margin-bottom:16px}
+.fwb-card.cog{border-top:5px solid #5AA7E0}
+.fwb-card.emb{border-top:5px solid #F06077}
+.fwb-card-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:16px}
+.fwb-card-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px}
+.cog .fwb-card-label{color:#1a6ab0}
+.emb .fwb-card-label{color:#c73355}
+.fwb-score-big{font-family:'Poppins',sans-serif;font-weight:700;font-size:32px;line-height:1;text-align:right}
+.fwb-score-big span{font-size:14px;color:#bbb;font-weight:500}
+.cog .fwb-score-big{color:#5AA7E0}
+.emb .fwb-score-big{color:#F06077}
+/* norm bar */
+.fwb-bar-wrap{margin-bottom:10px}
+.fwb-bar-outer{position:relative;background:#f0f0f8;border-radius:8px;height:12px;overflow:visible;margin-bottom:4px}
+.fwb-bar-fill{height:100%;border-radius:8px;transition:width 1.1s cubic-bezier(.2,.8,.2,1)}
+.cog .fwb-bar-fill{background:linear-gradient(90deg,#5AA7E0,#5AE0AD)}
+.emb .fwb-bar-fill{background:linear-gradient(90deg,#F06077,#935AE0)}
+.fwb-bar-mean-line{position:absolute;top:-4px;transform:translateX(-50%);width:3px;height:20px;background:#444;border-radius:2px;opacity:.5;pointer-events:none}
+.fwb-bar-mean-label{position:absolute;top:20px;transform:translateX(-50%);font-size:9px;font-weight:700;color:#999;white-space:nowrap}
+.fwb-bar-scale{display:flex;justify-content:space-between;font-size:10px;color:#ccc;font-weight:700;margin-top:18px}
+.fwb-norm-text{font-size:12px;font-weight:700;margin-bottom:12px;margin-top:6px}
+.norm-above{color:#0c7a52}.norm-mid{color:#d07a00}.norm-below{color:var(--redpink)}
+.fwb-card-desc{font-size:13px;color:#666;line-height:1.65;margin-bottom:12px}
+.fwb-reflect{font-size:12px;color:#999;font-style:italic;border-top:1px solid #f0f0f8;padding-top:10px;line-height:1.65}
+
+/* combined profile */
+.profile-card{background:#fff;border-radius:22px;padding:26px;box-shadow:0 4px 18px rgba(0,0,0,.07);margin-bottom:20px}
+.profile-card h3{font-family:'Poppins',sans-serif;font-weight:700;font-size:15px;margin-bottom:6px}
+.profile-note{font-size:12px;color:#888;margin-bottom:16px;line-height:1.65}
+.radar-wrap{display:flex;justify-content:center;margin-bottom:16px}
+
+/* insights */
+.insights{background:#fff;border-radius:22px;padding:26px;box-shadow:0 4px 18px rgba(0,0,0,.07);margin-bottom:20px}
+.insights h3{font-family:'Poppins',sans-serif;font-weight:700;font-size:16px;margin-bottom:18px}
+.ins-row{display:flex;gap:13px;margin-bottom:16px;align-items:flex-start}
+.ins-row:last-child{margin-bottom:0}
+.ins-ico{width:40px;height:40px;border-radius:11px;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:19px}
+.ic-b{background:var(--lindigo)}.ic-t{background:#c8f5e8}.ic-p{background:var(--lavender)}
+.ic-o{background:#fff0de}.ic-s{background:#D1EBFF}.ic-r{background:#fde8ec}
+.ins-body h4{font-size:13px;font-weight:700;margin-bottom:3px}
+.ins-body p{font-size:13px;color:#666;line-height:1.65}
+
+/* ceiling note */
+.ceiling-note{background:#f8f8ff;border:1px solid #eaeaf2;border-radius:14px;padding:12px 16px;font-size:11px;color:#aaa;line-height:1.7;margin-bottom:20px;text-align:center}
+
+.r-footer{text-align:center;margin-top:12px}
+.attr{text-align:center;margin-top:24px;font-size:11px;color:#ccc;line-height:1.9}
+</style>
+</head>
+<body>
+
+<div id="blobs">
+  <div class="blob b1"></div><div class="blob b2"></div>
+  <div class="blob b3"></div><div class="blob b4"></div>
+</div>
+
+<!-- ═══════════════════════════════ WELCOME ═══════════════════════════════ -->
+<div id="screen-welcome" class="screen active">
+  <div class="welcome-inner">
+    <div class="logo">
+      <div class="logo-ring"></div>
+      <div class="logo-label lg"><div class="the">The</div>Wellbeing Lab</div>
+    </div>
+    <h1 class="welcome-h1">Your <span class="grad">Financial<br>Mindfulness &amp; Well-Being</span> Profile</h1>
+    <div class="welcome-modules">
+      <div class="w-mod fm">
+        <div class="w-mod-title">Financial Mindfulness</div>
+        <ul>
+          <li>Financial Awareness</li>
+          <li>Financial Acceptance</li>
+        </ul>
+      </div>
+      <div class="w-mod fwb">
+        <div class="w-mod-title">Financial Well-Being</div>
+        <ul>
+          <li>Cognitive Well-Being</li>
+          <li>Emotional-Behavioral</li>
+        </ul>
+      </div>
+    </div>
+    <div class="pill-row">
+      <span class="pill pill-b">22 questions</span>
+      <span class="pill pill-p">&#8987; 5–7 minutes</span>
+      <span class="pill pill-t">&#10024; 4 dimensions</span>
+    </div>
+    <button class="btn btn-main" onclick="goFM()">Start Assessment &rarr;</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ FM QUESTIONS ═══════════════════════════════ -->
+<div id="screen-fm" class="screen">
+  <div class="q-wrap">
+    <div class="q-nav">
+      <div class="q-nav-left">
+        <div class="section-badge badge-fm">Part 1 of 3 &mdash; Financial Mindfulness</div>
+        <div class="q-nav-title">Financial Mindfulness Scale</div>
+        <div class="q-nav-sub">Rate each statement from 1 (Strongly Disagree) to 7 (Strongly Agree)</div>
+        <div class="prog-label"><span id="fmCount">0</span> of 8 answered</div>
+        <div class="prog-track"><div class="prog-fill pf-fm" id="fmFill"></div></div>
+      </div>
+      <div class="logo" style="flex-shrink:0;margin-top:4px">
+        <div class="logo-ring sm"></div>
+        <div class="logo-label"><div class="the">The</div>Wellbeing Lab</div>
+      </div>
+    </div>
+    <div id="fmBox"></div>
+    <div class="submit-zone">
+      <div class="err" id="fmErr">&#9888; Please answer all 8 questions before continuing.</div>
+      <button class="btn btn-next" onclick="goFWBA()">Continue &rarr;</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ FWB BLOCK A ═══════════════════════════════ -->
+<div id="screen-fwb-a" class="screen">
+  <div class="q-wrap">
+    <div class="q-nav">
+      <div class="q-nav-left">
+        <div class="section-badge badge-fwb">Part 2 of 3 &mdash; Financial Well-Being</div>
+        <div class="q-nav-title">Agreement Statements</div>
+        <div class="q-nav-sub">Rate how much you agree with each statement.<br>1 = Strongly Disagree &nbsp;·&nbsp; 5 = Strongly Agree</div>
+        <div class="prog-label"><span id="fwbACount">0</span> of 6 answered</div>
+        <div class="prog-track"><div class="prog-fill pf-fwb" id="fwbAFill"></div></div>
+      </div>
+      <div class="logo" style="flex-shrink:0;margin-top:4px">
+        <div class="logo-ring sm"></div>
+        <div class="logo-label"><div class="the">The</div>Wellbeing Lab</div>
+      </div>
+    </div>
+    <div id="fwbABox"></div>
+    <div class="submit-zone">
+      <div class="err" id="fwbAErr">&#9888; Please answer all 6 questions before continuing.</div>
+      <button class="btn btn-next" onclick="goFWBB()">Continue &rarr;</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ FWB BLOCK B ═══════════════════════════════ -->
+<div id="screen-fwb-b" class="screen">
+  <div class="q-wrap">
+    <div class="q-nav">
+      <div class="q-nav-left">
+        <div class="section-badge badge-fwb">Part 3 of 3 &mdash; Financial Well-Being</div>
+        <div class="q-nav-title">Frequency Statements</div>
+        <div class="q-nav-sub">How often do these apply to you?</div>
+        <div class="prog-label"><span id="fwbBCount">0</span> of 8 answered</div>
+        <div class="prog-track"><div class="prog-fill pf-fwb" id="fwbBFill"></div></div>
+      </div>
+      <div class="logo" style="flex-shrink:0;margin-top:4px">
+        <div class="logo-ring sm"></div>
+        <div class="logo-label"><div class="the">The</div>Wellbeing Lab</div>
+      </div>
+    </div>
+    <div id="fwbBBox"></div>
+    <div class="submit-zone">
+      <div class="err" id="fwbBErr">&#9888; Please answer all 8 questions before continuing.</div>
+      <button class="btn btn-main" onclick="submit()">See My Results &rarr;</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ RESULTS ═══════════════════════════════ -->
+<div id="screen-results" class="screen">
+  <div class="r-wrap">
+    <div class="r-header">
+      <div class="logo"><div class="logo-ring sm"></div><div class="logo-label"><div class="the">The</div>Wellbeing Lab</div></div>
+      <h2>Your Results</h2>
+      <p>Your scores across four dimensions of financial mindfulness and well-being.</p>
+    </div>
+
+    <!-- FM section -->
+    <div class="r-section-label rsl-fm">Financial Mindfulness</div>
+    <div class="two-col" id="fmDimCards"></div>
+    <div id="fmCompCard"></div>
+
+    <!-- FWB section -->
+    <div class="r-section-label rsl-fwb" style="margin-top:8px">Financial Well-Being</div>
+    <div id="fwbCards"></div>
+
+    <!-- Combined profile -->
+    <div class="r-section-label rsl-profile" style="margin-top:8px">Combined Profile</div>
+    <div class="profile-card" id="profileCard"></div>
+
+    <!-- Insights -->
+    <div class="insights" id="insBox"></div>
+
+    <div class="r-footer"><button class="btn btn-out" onclick="retake()">&larrhk; Retake Assessment</button></div>
+    <div class="attr">
+      Financial Mindfulness Scale: Garbinsky, Blanchard &amp; Kim (2024). <em>Personality and Social Psychology Bulletin</em>, 51(9), 1793–1809.<br>
+      Financial Well-Being dimensions: F&uuml;tterer, L. (2025). <em>Mind over Money.</em> Master's Thesis, Humboldt-Universit&auml;t zu Berlin.<br>
+      FWB items adapted from CFPB Financial Well-Being Scale (Consumer Financial Protection Bureau, 2015; German adaptation Lehner et al., 2023)<br>
+      and Compulsive Buying Behavior Scale (Faber &amp; O'Guinn, 1992).
+    </div>
+  </div>
+</div>
+
+<script>
+/* ─────────────────────────────────────────────────────────────────────────────
+   DATA
+───────────────────────────────────────────────────────────────────────────── */
+const FM_Qs = [
+  {id:1, text:"When I want to buy something, I know exactly how much money I have available to spend.",              d:"aw", rev:false},
+  {id:2, text:"I cannot look at my credit or debit card statements without having my emotions take over.",          d:"ac", rev:true},
+  {id:3, text:"Every month, I review the spending on my credit and debit cards.",                                   d:"aw", rev:false},
+  {id:4, text:"If my bank account balance is not where I want it to be, I find it difficult to focus on anything else.", d:"ac", rev:true},
+  {id:5, text:"I am very attentive to my personal finances.",                                                       d:"aw", rev:false},
+  {id:6, text:"I wish I could more easily control my emotions toward my personal finances.",                        d:"ac", rev:true},
+  {id:7, text:"I know almost exactly the total amount of money I have across my bank and investment account(s).",  d:"aw", rev:false},
+  {id:8, text:"When something changes in my financial life, I frequently react irrationally or inappropriately.",  d:"ac", rev:true},
+];
+
+// Block A — Agreement scale (1–5)
+const FWB_A = [
+  {id:"FWB01", text:"I could handle a major unexpected expense.",                                                    factor:"cog", rev:false},
+  {id:"FWB03", text:"I feel I can never get the things I want in life because of my financial situation.",           factor:"cog", rev:true},
+  {id:"FWB04", text:"I can enjoy life because of the way I manage my money.",                                        factor:"cog", rev:false},
+  {id:"FWB05", text:"I am just getting by financially.",                                                             factor:"cog", rev:true},
+  {id:"FWB06", text:"I am concerned that the money I have saved or will save won't last.",                           factor:"cog", rev:true},
+  {id:"CBB01", text:"When I have money left over at the end of the month, I just have to spend it.",                 factor:"emb", rev:true},
+];
+
+// Block B — Frequency scale (1–5)
+const FWB_B = [
+  {id:"FWB07", text:"Buying a gift for a wedding, birthday, or other occasion would strain my finances for the month.", factor:"cog", rev:true},
+  {id:"FWB10", text:"My finances control my life.",                                                                   factor:"cog", rev:true},
+  {id:"CBB02", text:"I have felt that others would be shocked if they knew about my spending habits.",               factor:"emb", rev:true},
+  {id:"CBB03", text:"I have bought things even though I couldn't afford them.",                                      factor:"emb", rev:true},
+  {id:"CBB04", text:"I have used 'buy now, pay later' services (e.g., Klarna) for non-essential purchases.",        factor:"emb", rev:true},
+  {id:"CBB05", text:"I have bought something to make myself feel better.",                                           factor:"emb", rev:true},
+  {id:"CBB07", text:"I have delayed repaying debt even when it caused me stress.",                                   factor:"emb", rev:true},
+  {id:"FWB09", text:"I am behind on my payments.",                                                                   factor:"emb", rev:true},
+];
+
+/* norm reference (n = 412 German adults, Fütterer 2025) */
+const COG_M = 3.78, COG_SD = 0.76;
+const EMB_M = 4.28, EMB_SD = 0.57;
+
+/* shuffled display orders (randomized per session within each block) */
+let fwbAOrder = [], fwbBOrder = [];
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   SCREEN NAVIGATION
+───────────────────────────────────────────────────────────────────────────── */
+function show(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+
+function goFM() {
+  renderFM();
+  show('screen-fm');
+}
+
+function goFWBA() {
+  const missing = FM_Qs.filter(q => getVfm(q.id) === null);
+  if (missing.length) {
+    document.getElementById('fmErr').style.display = 'block';
+    missing.forEach(q => document.getElementById('fc' + q.id)?.classList.add('bad'));
+    document.getElementById('fc' + missing[0].id)?.scrollIntoView({behavior:'smooth', block:'center'});
+    return;
+  }
+  document.getElementById('fmErr').style.display = 'none';
+  fwbAOrder = shuffle(FWB_A);
+  renderFWB('fwbABox', fwbAOrder, 'agree', 'fwbACount', 'fwbAFill', 6);
+  show('screen-fwb-a');
+}
+
+function goFWBB() {
+  const missing = fwbAOrder.filter(q => getVfwb(q.id) === null);
+  if (missing.length) {
+    document.getElementById('fwbAErr').style.display = 'block';
+    missing.forEach(q => document.getElementById('wc' + q.id)?.classList.add('bad'));
+    document.getElementById('wc' + missing[0].id)?.scrollIntoView({behavior:'smooth', block:'center'});
+    return;
+  }
+  document.getElementById('fwbAErr').style.display = 'none';
+  fwbBOrder = shuffle(FWB_B);
+  renderFWB('fwbBBox', fwbBOrder, 'freq', 'fwbBCount', 'fwbBFill', 8);
+  show('screen-fwb-b');
+}
+
+function submit() {
+  const missing = fwbBOrder.filter(q => getVfwb(q.id) === null);
+  if (missing.length) {
+    document.getElementById('fwbBErr').style.display = 'block';
+    missing.forEach(q => document.getElementById('wc' + q.id)?.classList.add('bad'));
+    document.getElementById('wc' + missing[0].id)?.scrollIntoView({behavior:'smooth', block:'center'});
+    return;
+  }
+  document.getElementById('fwbBErr').style.display = 'none';
+  const scores = computeAllScores();
+  showResults(scores);
+}
+
+function retake() {
+  show('screen-welcome');
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   RENDER HELPERS
+───────────────────────────────────────────────────────────────────────────── */
+function getVfm(id) {
+  const e = document.querySelector(`input[name="fm${id}"]:checked`);
+  return e ? +e.value : null;
+}
+
+function getVfwb(id) {
+  const e = document.querySelector(`input[name="fw${id}"]:checked`);
+  return e ? +e.value : null;
+}
+
+function renderFM() {
+  const box = document.getElementById('fmBox');
+  box.innerHTML = '';
+  FM_Qs.forEach((q, i) => {
+    const d = document.createElement('div');
+    d.className = 'q-card';
+    d.id = 'fc' + q.id;
+    d.innerHTML = `
+      <div class="q-num indigo">Question ${i+1} of ${FM_Qs.length}</div>
+      <div class="q-text">${q.text}</div>
+      <div class="likert-ends"><span>Strongly Disagree</span><span>Strongly Agree</span></div>
+      <div class="likert-opts">
+        ${[1,2,3,4,5,6,7].map(v => `
+          <div class="lopt">
+            <input type="radio" name="fm${q.id}" id="fm${q.id}v${v}" value="${v}" onchange="onFmAns()">
+            <label for="fm${q.id}v${v}">${v}</label>
+          </div>`).join('')}
+      </div>`;
+    box.appendChild(d);
+  });
+  document.getElementById('fmFill').style.width = '0%';
+  document.getElementById('fmCount').textContent = '0';
+}
+
+function onFmAns() {
+  const done = FM_Qs.filter(q => getVfm(q.id) !== null).length;
+  document.getElementById('fmFill').style.width = (done / FM_Qs.length * 100) + '%';
+  document.getElementById('fmCount').textContent = done;
+  FM_Qs.forEach(q => { if (getVfm(q.id) !== null) document.getElementById('fc' + q.id)?.classList.remove('bad'); });
+}
+
+const AGREE_ENDS = ['Strongly Disagree', 'Strongly Agree'];
+const FREQ_ENDS  = ['Never', 'Always'];
+const FREQ_SCALE = ['Never','Rarely','Sometimes','Often','Always'];
+
+function renderFWB(boxId, items, scale, countId, fillId, total) {
+  const box = document.getElementById(boxId);
+  box.innerHTML = '';
+  const ends = scale === 'agree' ? AGREE_ENDS : FREQ_ENDS;
+  items.forEach((q, i) => {
+    const d = document.createElement('div');
+    d.className = 'q-card fwb';
+    d.id = 'wc' + q.id;
+    d.innerHTML = `
+      <div class="q-num sky">Question ${i+1} of ${total}</div>
+      <div class="q-text">${q.text}</div>
+      <div class="likert-ends"><span>${ends[0]}</span><span>${ends[1]}</span></div>
+      <div class="likert-opts">
+        ${[1,2,3,4,5].map(v => `
+          <div class="lopt">
+            <input type="radio" name="fw${q.id}" id="fw${q.id}v${v}" value="${v}"
+              onchange="onFwbAns('${countId}','${fillId}',${total},'${boxId}')">
+            <label for="fw${q.id}v${v}">${v}</label>
+          </div>`).join('')}
+      </div>`;
+    box.appendChild(d);
+  });
+  document.getElementById(fillId).style.width = '0%';
+  document.getElementById(countId).textContent = '0';
+}
+
+function onFwbAns(countId, fillId, total, boxId) {
+  const box = document.getElementById(boxId);
+  const items = box ? [...box.querySelectorAll('.q-card')] : [];
+  const done = items.filter(c => {
+    const name = c.querySelector('input[type=radio]')?.name;
+    return name && document.querySelector(`input[name="${name}"]:checked`);
+  }).length;
+  document.getElementById(fillId).style.width = (done / total * 100) + '%';
+  document.getElementById(countId).textContent = done;
+  items.forEach(c => {
+    const name = c.querySelector('input[type=radio]')?.name;
+    if (name && document.querySelector(`input[name="${name}"]:checked`)) c.classList.remove('bad');
+  });
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   SCORING — pure function, no side effects
+   Returns: { awareness, acceptance, fm, cogFWB, embFWB }
+   awareness / acceptance / fm : scale 1–7
+   cogFWB / embFWB             : scale 1–5
+───────────────────────────────────────────────────────────────────────────── */
+function computeAllScores() {
+  // FM (reverse for ac items: new = 8 - old)
+  const awItems = FM_Qs.filter(q => q.d === 'aw');
+  const acItems = FM_Qs.filter(q => q.d === 'ac');
+  const awareness  = awItems.reduce((s, q) => s + getVfm(q.id), 0) / awItems.length;
+  const acceptance = acItems.reduce((s, q) => s + (8 - getVfm(q.id)), 0) / acItems.length;
+  const fm = (awareness + acceptance) / 2;
+
+  // FWB reverse coding: new = 6 - old  (1↔5, 2↔4, 3→3)
+  function rcFWB(v) { return 6 - v; }
+
+  const allFWB = [...FWB_A, ...FWB_B];
+  const cogItems = allFWB.filter(i => i.factor === 'cog');
+  const embItems = allFWB.filter(i => i.factor === 'emb');
+
+  function fwbMean(items) {
+    return items.reduce((s, i) => {
+      const v = getVfwb(i.id);
+      return s + (i.rev ? rcFWB(v) : v);
+    }, 0) / items.length;
+  }
+
+  const cogFWB = fwbMean(cogItems);
+  const embFWB = fwbMean(embItems);
+
+  return { awareness, acceptance, fm, cogFWB, embFWB };
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   RADAR CHART
+   Returns an SVG string. Axes: top=Awareness, right=CogFWB, bottom=EmbFWB, left=Acceptance.
+   All scores normalised to [0,1] for display; original values shown as labels.
+───────────────────────────────────────────────────────────────────────────── */
+function drawRadar(s) {
+  const cx = 150, cy = 150, maxR = 86;
+  // clockwise from top: Awareness, CogFWB, EmbFWB, Acceptance
+  const dims = [
+    { l1:'Financial', l2:'Awareness',   norm:(s.awareness -1)/6, color:'#5A68E0', val:s.awareness.toFixed(1),  unit:'/7' },
+    { l1:'Cognitive', l2:'FWB',          norm:(s.cogFWB    -1)/4, color:'#5AA7E0', val:s.cogFWB.toFixed(1),    unit:'/5' },
+    { l1:'Emotional-',l2:'Behavioral',   norm:(s.embFWB    -1)/4, color:'#F06077', val:s.embFWB.toFixed(1),    unit:'/5' },
+    { l1:'Financial', l2:'Acceptance',   norm:(s.acceptance-1)/6, color:'#5AE0AD', val:s.acceptance.toFixed(1),unit:'/7' },
+  ];
+  const angles = [-Math.PI/2, 0, Math.PI/2, Math.PI];
+
+  // Grid rings
+  const grid = [0.25, 0.5, 0.75, 1].map(lvl => {
+    const pts = angles.map(a =>
+      `${(cx + lvl*maxR*Math.cos(a)).toFixed(1)},${(cy + lvl*maxR*Math.sin(a)).toFixed(1)}`
+    ).join(' ');
+    return `<polygon points="${pts}" fill="${lvl===1?'rgba(90,104,224,0.04)':'none'}" stroke="#ccc8e0" stroke-width="${lvl===1?'1':'0.6'}" stroke-dasharray="${lvl===1?'':'3,3'}"/>`;
+  }).join('');
+
+  // Axis spokes
+  const spokes = angles.map(a =>
+    `<line x1="${cx}" y1="${cy}" x2="${(cx+maxR*Math.cos(a)).toFixed(1)}" y2="${(cy+maxR*Math.sin(a)).toFixed(1)}" stroke="#d4d0e8" stroke-width="1"/>`
+  ).join('');
+
+  // Score polygon (animated from center outward)
+  const polyPts = dims.map((d,i) =>
+    `${(cx + d.norm*maxR*Math.cos(angles[i])).toFixed(1)},${(cy + d.norm*maxR*Math.sin(angles[i])).toFixed(1)}`
+  );
+  const polyStr    = polyPts.join(' ');
+  const centerStr  = Array(4).fill(`${cx},${cy}`).join(' ');
+
+  // Animated dots (pop in after polygon draws)
+  const dots = dims.map((d, i) => {
+    const [px, py] = polyPts[i].split(',');
+    return `<circle cx="${px}" cy="${py}" r="0" fill="${d.color}" stroke="#fff" stroke-width="2.5">
+      <animate attributeName="r" from="0" to="5.5" dur="0.35s" begin="0.85s" calcMode="spline" keySplines="0.34 1.56 0.64 1" fill="freeze"/>
+    </circle>`;
+  }).join('');
+
+  // Text labels — absolute y positions, precomputed per axis
+  // top:   y=18,31,46  (above top data point at y=64)
+  // right: y=132,145,160 (centered at cy=150, right of right data point at x=236)
+  // bottom:y=258,271,286 (below bottom data point at y=236)
+  // left:  y=132,145,160 (centered at cy=150, left of left data point at x=64)
+  const lp = [
+    { anchor:'middle', x:cx,             y:[18,  31,  46 ] },
+    { anchor:'start',  x:cx+maxR+22,     y:[132, 145, 160] },
+    { anchor:'middle', x:cx,             y:[258, 271, 286] },
+    { anchor:'end',    x:cx-maxR-22,     y:[132, 145, 160] },
+  ];
+  const labels = dims.map((d, i) => {
+    const p = lp[i];
+    return `<text text-anchor="${p.anchor}" font-family="Poppins,sans-serif">
+      <tspan x="${p.x}" y="${p.y[0]}" font-size="9"    font-weight="700" fill="#999">${d.l1}</tspan>
+      <tspan x="${p.x}" y="${p.y[1]}" font-size="9"    font-weight="700" fill="#999">${d.l2}</tspan>
+      <tspan x="${p.x}" y="${p.y[2]}" font-size="14.5" font-weight="700" fill="${d.color}">${d.val}<tspan font-size="9" fill="#bbb">${d.unit}</tspan></tspan>
+    </text>`;
+  }).join('');
+
+  return `<svg viewBox="-20 -8 340 316" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:300px">
+    <defs>
+      <linearGradient id="rg" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%"   stop-color="#5A68E0" stop-opacity="0.75"/>
+        <stop offset="100%" stop-color="#5AE0AD" stop-opacity="0.75"/>
+      </linearGradient>
+    </defs>
+    ${grid}${spokes}
+    <polygon fill="rgba(90,104,224,0.13)" stroke="none">
+      <animate attributeName="points" from="${centerStr}" to="${polyStr}"
+        dur="0.9s" begin="0.05s" calcMode="spline" keySplines="0.16 1 0.3 1" fill="freeze"/>
+    </polygon>
+    <polygon fill="none" stroke="url(#rg)" stroke-width="2.5" stroke-linejoin="round">
+      <animate attributeName="points" from="${centerStr}" to="${polyStr}"
+        dur="0.9s" begin="0.05s" calcMode="spline" keySplines="0.16 1 0.3 1" fill="freeze"/>
+    </polygon>
+    ${dots}${labels}
+  </svg>`;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   RESULTS DISPLAY
+───────────────────────────────────────────────────────────────────────────── */
+const R = 50, CIRC = 2 * Math.PI * R;
+
+const AW_DESC = {
+  low:  "You may benefit from building habits to track your finances more closely. Small steps — checking balances weekly or reviewing monthly statements — can significantly increase your financial clarity.",
+  mod:  "You have a reasonable picture of your financial situation, though there are gaps. Consistent tracking habits can sharpen your awareness from a rough sense to a precise one.",
+  high: "Excellent financial awareness. You know where your money stands and stay on top of your accounts — a strong foundation for confident financial decision-making."
+};
+const AC_DESC = {
+  low:  "Financial matters tend to trigger strong emotions for you, making it hard to engage calmly with money. Building emotional regulation skills around finances can unlock healthier habits.",
+  mod:  "You manage financial emotions reasonably well, though some situations still feel overwhelming. With practice you can build greater equanimity when facing your financial reality.",
+  high: "You have a healthy, calm relationship with your finances. You can face financial facts — even uncomfortable ones — without being derailed by emotion, which supports better long-term decisions."
+};
+
+function fmTier(s) { return s < 3.5 ? 'low' : s < 5.5 ? 'mod' : 'high'; }
+function fmTierLabel(t) { return {low:'Developing', mod:'Growing', high:'Strong'}[t]; }
+function fmTierClass(t) { return {low:'t-low', mod:'t-mod', high:'t-high'}[t]; }
+
+function dimCard(cls, label, score, descs) {
+  const t = fmTier(score);
+  return `<div class="dim-card ${cls}">
+    <div class="dim-label">${label}</div>
+    <div class="circ">
+      <svg width="124" height="124" viewBox="0 0 124 124">
+        <circle class="circ-bg" cx="62" cy="62" r="${R}"/>
+        <circle class="circ-fg" id="g-${cls}" cx="62" cy="62" r="${R}"
+          stroke-dasharray="${CIRC.toFixed(1)}" stroke-dashoffset="${CIRC.toFixed(1)}"/>
+      </svg>
+      <div class="circ-inner">
+        <span class="circ-val">${score.toFixed(1)}</span>
+        <span class="circ-den">/ 7</span>
+      </div>
+    </div>
+    <div class="dim-tier ${fmTierClass(t)}">${fmTierLabel(t)}</div>
+    <div class="dim-desc">${descs[t]}</div>
+  </div>`;
+}
+
+function normText(score, mean, sd) {
+  if (score > mean + 0.5 * sd) return {cls:'norm-above', label:'Above the sample average'};
+  if (score < mean - 0.5 * sd) return {cls:'norm-below', label:'Below the sample average — a potential starting point for reflection'};
+  return {cls:'norm-mid', label:'Within the range of the sample average'};
+}
+
+function fwbCard(cls, label, score, desc) {
+  return `<div class="fwb-card ${cls}">
+    <div class="fwb-card-head">
+      <div class="fwb-card-label">${label}</div>
+      <div class="fwb-score-big">${score.toFixed(1)}<span> / 5</span></div>
+    </div>
+    <div class="fwb-card-desc">${desc}</div>
+  </div>`;
+}
+
+const COG_DESC = "Cognitive Financial Well-Being captures how secure, in control, and financially sufficient you feel. High scorers believe they can handle financial surprises and are not constrained by their finances in pursuing what matters to them.";
+const EMB_DESC = "Emotional-Behavioral Financial Well-Being captures how you feel and act around money — including impulse spending, avoidance, and compulsive patterns. High scores reflect greater emotional ease and fewer maladaptive money behaviours.";
+
+function showResults(s) {
+  // FM cards
+  document.getElementById('fmDimCards').innerHTML =
+    dimCard('aw', 'Financial Awareness', s.awareness, AW_DESC) +
+    dimCard('ac', 'Financial Acceptance', s.acceptance, AC_DESC);
+
+  document.getElementById('fmCompCard').innerHTML = `
+    <div class="comp-card">
+      <div class="comp-info">
+        <h3>Overall Financial Mindfulness</h3>
+        <p>Your composite score combines awareness and acceptance. Above 5.5 indicates strong financial mindfulness; below 3.5 suggests significant room to grow.</p>
+      </div>
+      <div class="comp-big">${s.fm.toFixed(1)}<span> / 7</span></div>
+    </div>`;
+
+  // FWB cards
+  document.getElementById('fwbCards').innerHTML =
+    fwbCard('cog', 'Cognitive Financial Well-Being', s.cogFWB, COG_DESC) +
+    fwbCard('emb', 'Emotional-Behavioral Financial Well-Being', s.embFWB, EMB_DESC);
+
+  // Combined profile — radar chart
+  document.getElementById('profileCard').innerHTML = `
+    <h3>Your Four-Dimension Profile</h3>
+    <p class="profile-note">
+      Each axis shows a normalised score (scales differ: FM&nbsp;1–7, FWB&nbsp;1–5).
+      <strong>Research note:</strong> Financial Acceptance was the strongest predictor
+      of both FWB dimensions (&beta;&nbsp;=&nbsp;.69 cognitive, &beta;&nbsp;=&nbsp;.55 emotional-behavioral).
+    </p>
+    <div class="radar-wrap">${drawRadar(s)}</div>`;
+
+  // Insights
+  const at = fmTier(s.awareness), ct = fmTier(s.acceptance);
+  const cogHigh = s.cogFWB >= COG_M - 0.5 * COG_SD;
+  const embHigh = s.embFWB >= EMB_M - 0.5 * EMB_SD;
+  let rows = '';
+
+  if (ct === 'high')
+    rows += ins('🌿','ic-t','Financial Acceptance — your strongest asset',
+      'Your ability to face financial realities without being overwhelmed is a core strength — and, based on the research, the single most important predictor of financial well-being.');
+  else
+    rows += ins('📌','ic-p','Financial Acceptance — the key lever',
+      'Studies show financial <em>acceptance</em> — not just awareness — is the strongest predictor of both cognitive and emotional-behavioral financial well-being (Fütterer, 2025). Working on this dimension tends to lift both FWB scores.');
+
+  if (at === 'high' && ct !== 'high')
+    rows += ins('💡','ic-b','Aware but emotionally reactive',
+      'You know your numbers well, but emotions can still get in the way. Focusing on acceptance — sitting with uncomfortable financial truths without overreacting — could unlock the next level.');
+
+  if (!cogHigh)
+    rows += ins('🧭','ic-s','Cognitive well-being: room to grow',
+      'Feeling in control of your finances and confident about the future is learnable. Small wins — building an emergency buffer, reviewing one financial goal — build the cognitive sense of security over time.');
+
+  if (!embHigh)
+    rows += ins('🛑','ic-r','Emotional-behavioral patterns to explore',
+      'Impulse spending, avoidance, and financial procrastination are common — and they respond well to mindfulness-based approaches. Noticing the <em>trigger</em> before acting is the first step.');
+
+  if (cogHigh && embHigh)
+    rows += ins('🌟','ic-p','Strong financial well-being',
+      'You score above average on both well-being dimensions. Continue to monitor — and consider how your own financial clarity might help those around you.');
+
+  rows += ins('📊','ic-b','Research highlight',
+    'The two FWB dimensions are related (r&nbsp;=&nbsp;.66) but distinct — it is possible to score high on one and low on the other. Your profile shows a nuanced picture that a single score would miss.');
+
+  document.getElementById('insBox').innerHTML = `<h3>What this means for you</h3>${rows}`;
+
+  show('screen-results');
+
+  // Animate FM gauges after paint
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    animFM('g-aw', s.awareness);
+    animFM('g-ac', s.acceptance);
+  }));
+}
+
+function animFM(id, score) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.style.strokeDashoffset = (CIRC * (1 - Math.max(0, Math.min(1, (score - 1) / 6)))).toFixed(1);
+}
+
+function animBar(id, score, min, max) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.style.width = (Math.max(0, Math.min(1, (score - min) / (max - min))) * 100).toFixed(1) + '%';
+}
+
+function ins(ico, icCls, title, body) {
+  return `<div class="ins-row"><div class="ins-ico ${icCls}">${ico}</div><div class="ins-body"><h4>${title}</h4><p>${body}</p></div></div>`;
+}
+</script>
+</body>
+</html>
