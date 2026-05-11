@@ -325,7 +325,8 @@ body{font-family:'Montserrat',sans-serif;background:var(--bg);color:#1a1a2e;min-
 
     <!-- FWB section -->
     <div class="r-section-label rsl-fwb" style="margin-top:8px">Financial Well-Being</div>
-    <div id="fwbCards"></div>
+    <div class="two-col" id="fwbDimCards"></div>
+    <div id="fwbCompCard"></div>
 
     <!-- Combined profile -->
     <div class="r-section-label rsl-profile" style="margin-top:8px">Combined Profile</div>
@@ -575,8 +576,9 @@ function computeAllScores() {
 
   const cogFWB = fwbMean(cogItems);
   const embFWB = fwbMean(embItems);
+  const fwb = (cogFWB + embFWB) / 2;
 
-  return { awareness, acceptance, fm, cogFWB, embFWB };
+  return { awareness, acceptance, fm, cogFWB, embFWB, fwb };
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
@@ -709,18 +711,38 @@ function normText(score, mean, sd) {
   return {cls:'norm-mid', label:'Within the range of the sample average'};
 }
 
-function fwbCard(cls, label, score, desc) {
-  return `<div class="fwb-card ${cls}">
-    <div class="fwb-card-head">
-      <div class="fwb-card-label">${label}</div>
-      <div class="fwb-score-big">${score.toFixed(1)}<span> / 5</span></div>
+function fwbTier(s) { return s < 2.5 ? 'low' : s < 3.75 ? 'mod' : 'high'; }
+
+function fwbDimCard(cls, label, score, descs) {
+  const t = fwbTier(score);
+  return `<div class="dim-card ${cls}">
+    <div class="dim-label">${label}</div>
+    <div class="circ">
+      <svg width="124" height="124" viewBox="0 0 124 124">
+        <circle class="circ-bg" cx="62" cy="62" r="${R}"/>
+        <circle class="circ-fg" id="g-${cls}" cx="62" cy="62" r="${R}"
+          stroke-dasharray="${CIRC.toFixed(1)}" stroke-dashoffset="${CIRC.toFixed(1)}"/>
+      </svg>
+      <div class="circ-inner">
+        <span class="circ-val">${score.toFixed(1)}</span>
+        <span class="circ-den">/ 5</span>
+      </div>
     </div>
-    <div class="fwb-card-desc">${desc}</div>
+    <div class="dim-tier ${fmTierClass(t)}">${fmTierLabel(t)}</div>
+    <div class="dim-desc">${descs[t]}</div>
   </div>`;
 }
 
-const COG_DESC = "Cognitive Financial Well-Being captures how secure, in control, and financially sufficient you feel. High scorers believe they can handle financial surprises and are not constrained by their finances in pursuing what matters to them.";
-const EMB_DESC = "Emotional-Behavioral Financial Well-Being captures how you feel and act around money — including impulse spending, avoidance, and compulsive patterns. High scores reflect greater emotional ease and fewer maladaptive money behaviours.";
+const COG_DESC = {
+  low:  "Your sense of financial security is currently limited. Building small buffers and clear goals can shift this meaningfully over time.",
+  mod:  "You have a moderate sense of financial control. There's room to build greater confidence in your long-term financial security.",
+  high: "You feel secure and in control of your finances — able to enjoy life without being substantially constrained by money worries."
+};
+const EMB_DESC = {
+  low:  "Emotional and impulsive patterns around money are having a significant impact. Awareness-based approaches can help interrupt these cycles before they compound.",
+  mod:  "Some reactive money behaviours show up at times, but they're not overwhelming. Targeted reflection can reduce their frequency.",
+  high: "You manage money with relatively little emotional reactivity or impulsive behaviour — a strong foundation for consistent financial decisions."
+};
 
 function showResults(s) {
   // FM cards
@@ -738,9 +760,18 @@ function showResults(s) {
     </div>`;
 
   // FWB cards
-  document.getElementById('fwbCards').innerHTML =
-    fwbCard('cog', 'Cognitive Financial Well-Being', s.cogFWB, COG_DESC) +
-    fwbCard('emb', 'Emotional-Behavioral Financial Well-Being', s.embFWB, EMB_DESC);
+  document.getElementById('fwbDimCards').innerHTML =
+    fwbDimCard('cog', 'Cognitive FWB', s.cogFWB, COG_DESC) +
+    fwbDimCard('emb', 'Emotional-Behavioral FWB', s.embFWB, EMB_DESC);
+
+  document.getElementById('fwbCompCard').innerHTML = `
+    <div class="comp-card" style="background:linear-gradient(130deg,#5AA7E0 0%,#5A68E0 55%,#5AE0AD 100%);margin-bottom:24px">
+      <div class="comp-info">
+        <h3>Overall Financial Well-Being</h3>
+        <p>Your composite score averages both FWB dimensions. Higher scores reflect greater financial security and fewer maladaptive money behaviours.</p>
+      </div>
+      <div class="comp-big">${s.fwb.toFixed(1)}<span> / 5</span></div>
+    </div>`;
 
   // Combined profile — radar chart
   document.getElementById('profileCard').innerHTML = `
@@ -788,10 +819,12 @@ function showResults(s) {
 
   show('screen-results');
 
-  // Animate FM gauges after paint
+  // Animate all gauges after paint
   requestAnimationFrame(() => requestAnimationFrame(() => {
-    animFM('g-aw', s.awareness);
-    animFM('g-ac', s.acceptance);
+    animFM('g-aw',  s.awareness);
+    animFM('g-ac',  s.acceptance);
+    animFWB('g-cog', s.cogFWB);
+    animFWB('g-emb', s.embFWB);
   }));
 }
 
@@ -799,6 +832,12 @@ function animFM(id, score) {
   const el = document.getElementById(id);
   if (!el) return;
   el.style.strokeDashoffset = (CIRC * (1 - Math.max(0, Math.min(1, (score - 1) / 6)))).toFixed(1);
+}
+
+function animFWB(id, score) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.style.strokeDashoffset = (CIRC * (1 - Math.max(0, Math.min(1, (score - 1) / 4)))).toFixed(1);
 }
 
 function animBar(id, score, min, max) {
