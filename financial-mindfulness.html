@@ -74,8 +74,10 @@ body{font-family:'Montserrat',sans-serif;background:var(--bg);color:#1a1a2e;min-
 
 /* question screens */
 .q-wrap{max-width:700px;margin:0 auto;padding:36px 20px 80px}
-.q-nav{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:28px}
+.q-nav{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;margin-bottom:16px}
 .q-nav-left{min-width:0}
+.q-instructions{font-size:14px;color:#555;line-height:1.75;margin-top:8px;max-width:560px}
+.q-prog{margin-bottom:28px}
 .section-badge{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.5px;padding:3px 10px;border-radius:20px;margin-bottom:6px;text-transform:uppercase}
 .badge-fm{background:rgba(90,104,224,.1);color:#5A68E0}
 .badge-fwb{background:rgba(90,167,224,.1);color:#1a6ab0}
@@ -211,23 +213,7 @@ body{font-family:'Montserrat',sans-serif;background:var(--bg);color:#1a1a2e;min-
       <div class="logo-ring"></div>
       <div class="logo-label lg"><div class="the">The</div>Wellbeing Lab</div>
     </div>
-    <h1 class="welcome-h1">Your <span class="grad">Financial<br>Mindfulness &amp; Well-Being</span> Profile</h1>
-    <div class="welcome-modules">
-      <div class="w-mod fm">
-        <div class="w-mod-title">Financial Mindfulness</div>
-        <ul>
-          <li>Financial Awareness</li>
-          <li>Financial Acceptance</li>
-        </ul>
-      </div>
-      <div class="w-mod fwb">
-        <div class="w-mod-title">Financial Well-Being</div>
-        <ul>
-          <li>Cognitive Well-Being</li>
-          <li>Emotional-Behavioral</li>
-        </ul>
-      </div>
-    </div>
+    <h1 class="welcome-h1">Explore your <span class="grad">Financial<br>Mindfulness &amp; Well-Being</span></h1>
     <div class="pill-row">
       <span class="pill pill-b">22 questions</span>
       <span class="pill pill-p">&#8987; 5–7 minutes</span>
@@ -243,15 +229,16 @@ body{font-family:'Montserrat',sans-serif;background:var(--bg);color:#1a1a2e;min-
     <div class="q-nav">
       <div class="q-nav-left">
         <div class="section-badge badge-fm">Part 1 of 3 &mdash; Financial Mindfulness</div>
-        <div class="q-nav-title">Financial Mindfulness Scale</div>
-        <div class="q-nav-sub">Rate each statement from 1 (Strongly Disagree) to 7 (Strongly Agree)</div>
-        <div class="prog-label"><span id="fmCount">0</span> of 8 answered</div>
-        <div class="prog-track"><div class="prog-fill pf-fm" id="fmFill"></div></div>
+        <p class="q-instructions">The following statements concern your attentiveness to and handling of your personal finances. Please indicate the extent to which you agree with each statement.</p>
       </div>
       <div class="logo" style="flex-shrink:0;margin-top:4px">
         <div class="logo-ring sm"></div>
         <div class="logo-label"><div class="the">The</div>Wellbeing Lab</div>
       </div>
+    </div>
+    <div class="q-prog">
+      <div class="prog-label"><span id="fmCount">0</span> of 8 answered</div>
+      <div class="prog-track"><div class="prog-fill pf-fm" id="fmFill"></div></div>
     </div>
     <div id="fmBox"></div>
     <div class="submit-zone">
