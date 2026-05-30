@@ -702,15 +702,24 @@ function normText(score, mean, sd) {
 
 function fwbTier(s) { return s < 2.5 ? 'low' : s < 3.75 ? 'mod' : 'high'; }
 
+const FWB_STROKE = { cog: '#5AA7E0', emb: '#F06077' };
+
 function fwbDimCard(cls, label, score, descs) {
   const t = fwbTier(score);
+  const color = FWB_STROKE[cls];
+  const finalOff = (CIRC * (1 - Math.max(0, Math.min(1, (score - 1) / 4)))).toFixed(1);
   return `<div class="dim-card ${cls}">
     <div class="dim-label">${label}</div>
     <div class="circ">
       <svg width="124" height="124" viewBox="0 0 124 124">
         <circle class="circ-bg" cx="62" cy="62" r="${R}"/>
-        <circle class="circ-fg" id="g-${cls}" cx="62" cy="62" r="${R}"
-          stroke-dasharray="${CIRC.toFixed(1)}" stroke-dashoffset="${CIRC.toFixed(1)}"/>
+        <circle class="circ-fg" cx="62" cy="62" r="${R}"
+          stroke="${color}"
+          stroke-dasharray="${CIRC.toFixed(1)}" stroke-dashoffset="${CIRC.toFixed(1)}">
+          <animate attributeName="stroke-dashoffset"
+            from="${CIRC.toFixed(1)}" to="${finalOff}"
+            dur="1.3s" begin="0.1s" calcMode="spline" keySplines="0.2 0.8 0.2 1" fill="freeze"/>
+        </circle>
       </svg>
       <div class="circ-inner">
         <span class="circ-val">${score.toFixed(1)}</span>
@@ -743,7 +752,7 @@ function showResults(s) {
     <div class="comp-card">
       <div class="comp-info">
         <h3>Overall Financial Mindfulness</h3>
-        <p>Your composite score combines awareness and acceptance. Above 5.5 indicates strong financial mindfulness; below 3.5 suggests significant room to grow.</p>
+        <p>Your composite score combines both dimensions of financial mindfulness.</p>
       </div>
       <div class="comp-big">${s.fm.toFixed(1)}<span> / 7</span></div>
     </div>`;
@@ -812,8 +821,6 @@ function showResults(s) {
   requestAnimationFrame(() => requestAnimationFrame(() => {
     animFM('g-aw',  s.awareness);
     animFM('g-ac',  s.acceptance);
-    animFWB('g-cog', s.cogFWB);
-    animFWB('g-emb', s.embFWB);
   }));
 }
 
