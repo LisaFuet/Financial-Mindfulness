@@ -29,20 +29,14 @@ body{font-family:'Montserrat',sans-serif;background:var(--bg);color:#1a1a2e;min-
 .screen.active{display:block}
 
 /* logo */
-.logo{display:flex;align-items:center;gap:10px}
-.logo-ring{width:44px;height:44px;border-radius:50%;flex-shrink:0;position:relative;
-  background:conic-gradient(#5AA7E0 0deg,#5A68E0 51deg,#935AE0 103deg,#E05AD3 154deg,#F06077 206deg,#FF8666 257deg,#FFB366 309deg,#5AE0AD 360deg)}
-.logo-ring::after{content:'';position:absolute;inset:8px;border-radius:50%;background:var(--bg)}
-.logo-ring.sm{width:34px;height:34px}
-.logo-ring.sm::after{inset:6px}
-.logo-label{font-family:'Poppins',sans-serif;font-weight:700;font-size:15px;line-height:1.2;text-align:left}
-.logo-label .the{font-weight:500;font-size:10px;color:#999;letter-spacing:.5px;text-transform:uppercase}
-.logo-label.lg{font-size:22px}
+.logo-img{display:block;flex-shrink:0}
+.logo-img-lg{height:52px}
+.logo-img-sm{height:36px}
 
 /* welcome */
 #screen-welcome{min-height:100vh}
 .welcome-inner{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:48px 24px}
-.welcome-inner .logo{justify-content:center;margin-bottom:44px}
+.welcome-inner .logo-img-lg{margin-bottom:44px}
 .welcome-h1{font-family:'Poppins',sans-serif;font-weight:700;font-size:clamp(26px,5vw,46px);line-height:1.15;margin-bottom:18px}
 .grad{background:linear-gradient(120deg,#5A68E0 20%,#E05AD3 80%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 .welcome-sub{font-size:15px;color:#555;max-width:540px;line-height:1.8;margin-bottom:28px}
@@ -221,10 +215,7 @@ body{font-family:'Montserrat',sans-serif;background:var(--bg);color:#1a1a2e;min-
 <!-- ═══════════════════════════════ WELCOME ═══════════════════════════════ -->
 <div id="screen-welcome" class="screen active">
   <div class="welcome-inner">
-    <div class="logo">
-      <div class="logo-ring"></div>
-      <div class="logo-label lg"><div class="the">The</div>Wellbeing Lab</div>
-    </div>
+    <img src="logo.png" alt="The Wellbeing Lab" class="logo-img logo-img-lg">
     <h1 class="welcome-h1">Explore your <span class="grad">Financial<br>Mindfulness &amp; Well-Being</span></h1>
     <div class="pill-row">
       <span class="pill pill-b">22 questions</span>
@@ -243,10 +234,7 @@ body{font-family:'Montserrat',sans-serif;background:var(--bg);color:#1a1a2e;min-
         <div class="section-badge badge-fm">Part 1 of 3 &mdash; Financial Mindfulness</div>
         <p class="q-instructions">The following statements concern your attentiveness to and handling of your personal finances. Please indicate the extent to which you agree with each statement.</p>
       </div>
-      <div class="logo" style="flex-shrink:0;margin-top:4px">
-        <div class="logo-ring sm"></div>
-        <div class="logo-label"><div class="the">The</div>Wellbeing Lab</div>
-      </div>
+      <img src="logo.png" alt="The Wellbeing Lab" class="logo-img logo-img-sm" style="margin-top:4px">
     </div>
     <div class="q-prog">
       <div class="prog-label"><span id="fmCount">0</span> of 8 answered</div>
@@ -268,10 +256,7 @@ body{font-family:'Montserrat',sans-serif;background:var(--bg);color:#1a1a2e;min-
         <div class="section-badge badge-fwb">Part 2 of 3 &mdash; Financial Well-Being</div>
         <p class="q-instructions">The following statements concern your financial situation. Please indicate the extent to which you agree with each statement.</p>
       </div>
-      <div class="logo" style="flex-shrink:0;margin-top:4px">
-        <div class="logo-ring sm"></div>
-        <div class="logo-label"><div class="the">The</div>Wellbeing Lab</div>
-      </div>
+      <img src="logo.png" alt="The Wellbeing Lab" class="logo-img logo-img-sm" style="margin-top:4px">
     </div>
     <div class="q-prog">
       <div class="prog-label"><span id="fwbACount">0</span> of 6 answered</div>
@@ -293,10 +278,7 @@ body{font-family:'Montserrat',sans-serif;background:var(--bg);color:#1a1a2e;min-
         <div class="section-badge badge-fwb">Part 3 of 3 &mdash; Financial Well-Being</div>
         <p class="q-instructions">The following statements concern your financial behaviours and experiences. Please indicate how often each applies to you.</p>
       </div>
-      <div class="logo" style="flex-shrink:0;margin-top:4px">
-        <div class="logo-ring sm"></div>
-        <div class="logo-label"><div class="the">The</div>Wellbeing Lab</div>
-      </div>
+      <img src="logo.png" alt="The Wellbeing Lab" class="logo-img logo-img-sm" style="margin-top:4px">
     </div>
     <div class="q-prog">
       <div class="prog-label"><span id="fwbBCount">0</span> of 8 answered</div>
@@ -314,7 +296,7 @@ body{font-family:'Montserrat',sans-serif;background:var(--bg);color:#1a1a2e;min-
 <div id="screen-results" class="screen">
   <div class="r-wrap">
     <div class="r-header">
-      <div class="logo"><div class="logo-ring sm"></div><div class="logo-label"><div class="the">The</div>Wellbeing Lab</div></div>
+      <img src="logo.png" alt="The Wellbeing Lab" class="logo-img logo-img-sm">
       <h2>Your Results</h2>
       <p>Your scores across four dimensions of financial mindfulness and well-being.</p>
     </div>
