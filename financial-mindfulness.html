@@ -196,7 +196,10 @@ body{font-family:'Montserrat',sans-serif;background:var(--bg);color:#1a1a2e;min-
 .ceiling-note{background:#f8f8ff;border:1px solid #eaeaf2;border-radius:14px;padding:12px 16px;font-size:11px;color:#aaa;line-height:1.7;margin-bottom:20px;text-align:center}
 
 .r-footer{text-align:center;margin-top:12px}
-.attr{text-align:center;margin-top:24px;font-size:11px;color:#ccc;line-height:1.9}
+.fn{font-size:9px;vertical-align:super;color:#bbb;font-weight:700;margin-left:1px}
+.footnotes{margin-top:20px;font-size:11px;color:#bbb;line-height:1.8;padding:14px 16px;border-top:1px solid #eaeaf2}
+.footnotes p{margin-bottom:4px}
+.attr{text-align:center;margin-top:16px;font-size:11px;color:#ccc;line-height:1.9}
 </style>
 </head>
 <body>
@@ -325,6 +328,10 @@ body{font-family:'Montserrat',sans-serif;background:var(--bg);color:#1a1a2e;min-
     <div class="insights" id="insBox"></div>
 
     <div class="r-footer"><button class="btn btn-out" onclick="retake()">&larrhk; Retake Assessment</button></div>
+    <div class="footnotes">
+      <p><sup class="fn">1</sup> Score ranges (Developing · Growing · Strong) are based on equal thirds of the respective scale (FM: 1–7; FWB: 1–5). No empirically validated cutpoints exist for either instrument. The original FWB sample (F&uuml;tterer, 2025; <em>n</em>&nbsp;=&nbsp;412) showed pronounced ceiling effects, making norm-based classification unreliable.</p>
+      <p><sup class="fn">2</sup> The interpretive descriptions are intended as reflective prompts only — not clinical assessments or validated characterisations of financial behaviour.</p>
+    </div>
     <div class="attr">
       Financial Mindfulness Scale: Garbinsky, Blanchard &amp; Kim (2024). <em>Personality and Social Psychology Bulletin</em>, 51(9), 1793–1809.<br>
       Financial Well-Being dimensions: F&uuml;tterer, L. (2025). <em>Mind over Money.</em> Master's Thesis, Humboldt-Universit&auml;t zu Berlin.<br>
@@ -689,8 +696,8 @@ function dimCard(cls, label, score, descs) {
         <span class="circ-den">/ 7</span>
       </div>
     </div>
-    <div class="dim-tier ${fmTierClass(t)}">${fmTierLabel(t)}</div>
-    <div class="dim-desc">${descs[t]}</div>
+    <div class="dim-tier ${fmTierClass(t)}">${fmTierLabel(t)}<sup class="fn">1</sup></div>
+    <div class="dim-desc">${descs[t]}<sup class="fn">2</sup></div>
   </div>`;
 }
 
@@ -726,8 +733,8 @@ function fwbDimCard(cls, label, score, descs) {
         <span class="circ-den">/ 5</span>
       </div>
     </div>
-    <div class="dim-tier ${fmTierClass(t)}">${fmTierLabel(t)}</div>
-    <div class="dim-desc">${descs[t]}</div>
+    <div class="dim-tier ${fmTierClass(t)}">${fmTierLabel(t)}<sup class="fn">1</sup></div>
+    <div class="dim-desc">${descs[t]}<sup class="fn">2</sup></div>
   </div>`;
 }
 
