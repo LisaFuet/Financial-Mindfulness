@@ -175,11 +175,20 @@ body{font-family:'Montserrat',sans-serif;background:var(--bg);color:#1a1a2e;min-
 .fwb-card-desc{font-size:13px;color:#666;line-height:1.65;margin-bottom:12px}
 .fwb-reflect{font-size:12px;color:#999;font-style:italic;border-top:1px solid #f0f0f8;padding-top:10px;line-height:1.65}
 
-/* combined profile */
+/* combined profile — dot plot */
 .profile-card{background:#fff;border-radius:22px;padding:26px;box-shadow:0 4px 18px rgba(0,0,0,.07);margin-bottom:20px}
 .profile-card h3{font-family:'Poppins',sans-serif;font-weight:700;font-size:15px;margin-bottom:6px}
-.profile-note{font-size:12px;color:#888;margin-bottom:16px;line-height:1.65}
-.radar-wrap{display:flex;justify-content:center;margin-bottom:16px}
+.profile-note{font-size:12px;color:#888;margin-bottom:22px;line-height:1.65}
+.dotplot{display:flex;flex-direction:column;gap:18px}
+.dp-sep{height:1px;background:#f0f0f8;margin:2px 0}
+.dp-row{display:flex;align-items:center;gap:12px}
+.dp-label{font-size:12px;font-weight:700;color:#555;width:178px;flex-shrink:0;line-height:1.4}
+@media(max-width:480px){.dp-label{width:110px;font-size:11px}}
+.dp-track-wrap{flex:1;padding:0 7px}
+.dp-track{width:100%;height:2px;background:#eaeaf2;border-radius:2px;position:relative}
+.dp-line{position:absolute;left:0;top:0;height:2px;border-radius:2px;width:0%;transition:width 1s cubic-bezier(.2,.8,.2,1)}
+.dp-dot{position:absolute;top:50%;transform:translate(-50%,-50%);width:13px;height:13px;border-radius:50%;border:2.5px solid #fff;box-shadow:0 1px 6px rgba(0,0,0,.18);left:0%;transition:left 1s cubic-bezier(.2,.8,.2,1)}
+.dp-val{font-size:12px;font-weight:700;width:38px;text-align:right;flex-shrink:0}
 
 /* insights */
 .insights{background:#fff;border-radius:22px;padding:26px;box-shadow:0 4px 18px rgba(0,0,0,.07);margin-bottom:20px}
@@ -578,87 +587,31 @@ function computeAllScores() {
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
-   RADAR CHART
-   Returns an SVG string. Axes: top=Awareness, right=CogFWB, bottom=EmbFWB, left=Acceptance.
-   All scores normalised to [0,1] for display; original values shown as labels.
+   DOT PLOT
+   Returns an HTML string. Each row: label | animated track + dot | score value.
+   Tracks span the full scale range; positions are normalised to [0,1] for display.
 ───────────────────────────────────────────────────────────────────────────── */
-function drawRadar(s) {
-  const cx = 150, cy = 150, maxR = 86;
-  // clockwise from top: Awareness, CogFWB, EmbFWB, Acceptance
-  const dims = [
-    { l1:'Financial', l2:'Awareness',   norm:(s.awareness -1)/6, color:'#5A68E0', val:s.awareness.toFixed(1),  unit:'/7' },
-    { l1:'Cognitive', l2:'FWB',          norm:(s.cogFWB    -1)/4, color:'#5AA7E0', val:s.cogFWB.toFixed(1),    unit:'/5' },
-    { l1:'Emotional-',l2:'Behavioral',   norm:(s.embFWB    -1)/4, color:'#F06077', val:s.embFWB.toFixed(1),    unit:'/5' },
-    { l1:'Financial', l2:'Acceptance',   norm:(s.acceptance-1)/6, color:'#5AE0AD', val:s.acceptance.toFixed(1),unit:'/7' },
-  ];
-  const angles = [-Math.PI/2, 0, Math.PI/2, Math.PI];
-
-  // Grid rings
-  const grid = [0.25, 0.5, 0.75, 1].map(lvl => {
-    const pts = angles.map(a =>
-      `${(cx + lvl*maxR*Math.cos(a)).toFixed(1)},${(cy + lvl*maxR*Math.sin(a)).toFixed(1)}`
-    ).join(' ');
-    return `<polygon points="${pts}" fill="${lvl===1?'rgba(90,104,224,0.04)':'none'}" stroke="#ccc8e0" stroke-width="${lvl===1?'1':'0.6'}" stroke-dasharray="${lvl===1?'':'3,3'}"/>`;
-  }).join('');
-
-  // Axis spokes
-  const spokes = angles.map(a =>
-    `<line x1="${cx}" y1="${cy}" x2="${(cx+maxR*Math.cos(a)).toFixed(1)}" y2="${(cy+maxR*Math.sin(a)).toFixed(1)}" stroke="#d4d0e8" stroke-width="1"/>`
-  ).join('');
-
-  // Score polygon (animated from center outward)
-  const polyPts = dims.map((d,i) =>
-    `${(cx + d.norm*maxR*Math.cos(angles[i])).toFixed(1)},${(cy + d.norm*maxR*Math.sin(angles[i])).toFixed(1)}`
-  );
-  const polyStr    = polyPts.join(' ');
-  const centerStr  = Array(4).fill(`${cx},${cy}`).join(' ');
-
-  // Animated dots (pop in after polygon draws)
-  const dots = dims.map((d, i) => {
-    const [px, py] = polyPts[i].split(',');
-    return `<circle cx="${px}" cy="${py}" r="0" fill="${d.color}" stroke="#fff" stroke-width="2.5">
-      <animate attributeName="r" from="0" to="5.5" dur="0.35s" begin="0.85s" calcMode="spline" keySplines="0.34 1.56 0.64 1" fill="freeze"/>
-    </circle>`;
-  }).join('');
-
-  // Text labels — absolute y positions, precomputed per axis
-  // top:   y=18,31,46  (above top data point at y=64)
-  // right: y=132,145,160 (centered at cy=150, right of right data point at x=236)
-  // bottom:y=258,271,286 (below bottom data point at y=236)
-  // left:  y=132,145,160 (centered at cy=150, left of left data point at x=64)
-  const lp = [
-    { anchor:'middle', x:cx,             y:[18,  31,  46 ] },
-    { anchor:'start',  x:cx+maxR+22,     y:[132, 145, 160] },
-    { anchor:'middle', x:cx,             y:[258, 271, 286] },
-    { anchor:'end',    x:cx-maxR-22,     y:[132, 145, 160] },
-  ];
-  const labels = dims.map((d, i) => {
-    const p = lp[i];
-    return `<text text-anchor="${p.anchor}" font-family="Poppins,sans-serif">
-      <tspan x="${p.x}" y="${p.y[0]}" font-size="9"    font-weight="700" fill="#999">${d.l1}</tspan>
-      <tspan x="${p.x}" y="${p.y[1]}" font-size="9"    font-weight="700" fill="#999">${d.l2}</tspan>
-      <tspan x="${p.x}" y="${p.y[2]}" font-size="14.5" font-weight="700" fill="${d.color}">${d.val}<tspan font-size="9" fill="#bbb">${d.unit}</tspan></tspan>
-    </text>`;
-  }).join('');
-
-  return `<svg viewBox="-20 -8 340 316" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:300px">
-    <defs>
-      <linearGradient id="rg" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%"   stop-color="#5A68E0" stop-opacity="0.75"/>
-        <stop offset="100%" stop-color="#5AE0AD" stop-opacity="0.75"/>
-      </linearGradient>
-    </defs>
-    ${grid}${spokes}
-    <polygon fill="rgba(90,104,224,0.13)" stroke="none">
-      <animate attributeName="points" from="${centerStr}" to="${polyStr}"
-        dur="0.9s" begin="0.05s" calcMode="spline" keySplines="0.16 1 0.3 1" fill="freeze"/>
-    </polygon>
-    <polygon fill="none" stroke="url(#rg)" stroke-width="2.5" stroke-linejoin="round">
-      <animate attributeName="points" from="${centerStr}" to="${polyStr}"
-        dur="0.9s" begin="0.05s" calcMode="spline" keySplines="0.16 1 0.3 1" fill="freeze"/>
-    </polygon>
-    ${dots}${labels}
-  </svg>`;
+function drawDotPlot(s) {
+  function row(label, val, min, max, color, id) {
+    const pct = ((val - min) / (max - min) * 100).toFixed(1);
+    return `<div class="dp-row">
+      <div class="dp-label">${label}</div>
+      <div class="dp-track-wrap">
+        <div class="dp-track">
+          <div class="dp-line" data-pct="${pct}" style="width:0%;background:${color};opacity:0.35"></div>
+          <div class="dp-dot"  data-pct="${pct}" style="left:0%;background:${color}"></div>
+        </div>
+      </div>
+      <div class="dp-val" style="color:${color}">${val.toFixed(1)}<span style="color:#ccc;font-weight:500">/${max}</span></div>
+    </div>`;
+  }
+  return `<div class="dotplot">
+    ${row('Financial Awareness',      s.awareness,  1, 7, '#5A68E0', 'aw')}
+    ${row('Financial Acceptance',     s.acceptance, 1, 7, '#5AE0AD', 'ac')}
+    <div class="dp-sep"></div>
+    ${row('Cognitive FWB',            s.cogFWB,     1, 5, '#5AA7E0', 'cog')}
+    ${row('Emotional-Behavioral FWB', s.embFWB,     1, 5, '#F06077', 'emb')}
+  </div>`;
 }
 
 /* ─────────────────────────────────────────────────────────────────────────────
@@ -778,15 +731,15 @@ function showResults(s) {
       <div class="comp-big">${s.fwb.toFixed(1)}<span> / 5</span></div>
     </div>`;
 
-  // Combined profile — radar chart
+  // Combined profile — dot plot
   document.getElementById('profileCard').innerHTML = `
     <h3>Your Four-Dimension Profile</h3>
     <p class="profile-note">
-      Each axis shows a normalised score (scales differ: FM&nbsp;1–7, FWB&nbsp;1–5).
+      Each track spans the full scale range (FM&nbsp;1–7, FWB&nbsp;1–5).
       <strong>Research note:</strong> Financial Acceptance was the strongest predictor
       of both FWB dimensions (&beta;&nbsp;=&nbsp;.69 cognitive, &beta;&nbsp;=&nbsp;.55 emotional-behavioral).
     </p>
-    <div class="radar-wrap">${drawRadar(s)}</div>`;
+    ${drawDotPlot(s)}`;
 
   // Insights
   const at = fmTier(s.awareness), ct = fmTier(s.acceptance);
@@ -824,10 +777,12 @@ function showResults(s) {
 
   show('screen-results');
 
-  // Animate all gauges after paint
+  // Animate all gauges + dot plot after paint
   requestAnimationFrame(() => requestAnimationFrame(() => {
-    animFM('g-aw',  s.awareness);
-    animFM('g-ac',  s.acceptance);
+    animFM('g-aw', s.awareness);
+    animFM('g-ac', s.acceptance);
+    document.querySelectorAll('.dp-line').forEach(el => { el.style.width = el.dataset.pct + '%'; });
+    document.querySelectorAll('.dp-dot').forEach(el  => { el.style.left  = el.dataset.pct + '%'; });
   }));
 }
 
